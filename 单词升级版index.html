@@ -1,0 +1,1428 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>🎮 词汇猎人 · 六级怪物</title>
+<style>
+:root {
+    --bg: #f5f5f7;
+    --card: #ffffff;
+    --text: #1d1d1f;
+    --text2: #86868b;
+    --accent: #0071e3;
+    --accent2: #ff3b30;
+    --accent3: #ff9500;
+    --border: #d2d2d7;
+    --shadow: 0 20px 60px rgba(0,0,0,0.08);
+    --radius: 24px;
+    --radius-sm: 14px;
+    --radius-xs: 10px;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background: var(--bg);
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* 主容器 */
+.app-container {
+    width: 100%;
+    max-width: 480px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+/* 卡片通用样式 */
+.card {
+    background: var(--card);
+    border-radius: var(--radius);
+    padding: 24px;
+    box-shadow: var(--shadow);
+    border: 1px solid rgba(0,0,0,0.04);
+}
+
+/* 导航栏 */
+.nav-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    margin-bottom: -8px;
+}
+
+.nav-title {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--text);
+    letter-spacing: -0.5px;
+}
+
+.nav-btns {
+    display: flex;
+    gap: 8px;
+}
+
+.nav-btn {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: none;
+    background: var(--card);
+    font-size: 20px;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+.nav-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+}
+
+.nav-btn:active {
+    transform: scale(0.95);
+}
+
+.badge {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    background: var(--accent2);
+    color: white;
+    font-size: 11px;
+    font-weight: 600;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* 怪物卡片 */
+.monster-card {
+    text-align: center;
+    padding: 28px 24px;
+    position: relative;
+    overflow: hidden;
+}
+
+.monster-card::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle at 50% 60%, rgba(0,113,227,0.04) 0%, transparent 50%);
+    pointer-events: none;
+}
+
+.monster-emoji {
+    font-size: 100px;
+    display: inline-block;
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    filter: drop-shadow(0 8px 20px rgba(0,0,0,0.1));
+    line-height: 1;
+}
+
+.monster-emoji.shake {
+    animation: monsterShake 0.4s ease-out;
+}
+
+.monster-emoji.crit-shake {
+    animation: monsterCritShake 0.5s ease-out;
+}
+
+.monster-emoji.ult-hit {
+    animation: monsterUltHit 0.6s ease-out;
+}
+
+@keyframes monsterShake {
+    0%,100%{ transform: translateX(0) rotate(0); }
+    20%{ transform: translateX(-8px) rotate(-3deg); }
+    40%{ transform: translateX(8px) rotate(3deg); }
+    60%{ transform: translateX(-5px) rotate(-2deg); }
+    80%{ transform: translateX(5px) rotate(2deg); }
+}
+
+@keyframes monsterCritShake {
+    0%,100%{ transform: scale(1) rotate(0); }
+    20%{ transform: scale(0.85) rotate(-8deg); }
+    40%{ transform: scale(1.15) rotate(8deg); }
+    60%{ transform: scale(0.9) rotate(-5deg); }
+    80%{ transform: scale(1.05) rotate(5deg); }
+}
+
+@keyframes monsterUltHit {
+    0%{ transform: translateY(0) scale(1); opacity:1; }
+    30%{ transform: translateY(-30px) scale(1.2); }
+    60%{ transform: translateY(10px) scale(0.8); opacity:0.6; }
+    100%{ transform: translateY(0) scale(1); opacity:1; }
+}
+
+.monster-name {
+    font-size: 14px;
+    color: var(--text2);
+    margin-top: 4px;
+    font-weight: 500;
+}
+
+/* 血条 */
+.hp-container {
+    margin-top: 14px;
+}
+
+.hp-bar-outer {
+    height: 8px;
+    background: #e5e5ea;
+    border-radius: 100px;
+    overflow: hidden;
+}
+
+.hp-bar-inner {
+    height: 100%;
+    background: var(--accent2);
+    border-radius: 100px;
+    transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.hp-label {
+    font-size: 12px;
+    color: var(--text2);
+    margin-top: 6px;
+    font-weight: 500;
+}
+
+/* 单词卡片 */
+.word-card {
+    padding: 20px 24px;
+}
+
+.word-main {
+    font-size: 36px;
+    font-weight: 700;
+    color: var(--text);
+    letter-spacing: -1px;
+    margin-bottom: 4px;
+}
+
+.word-pos {
+    display: inline-block;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--accent);
+    background: rgba(0,113,227,0.08);
+    padding: 3px 10px;
+    border-radius: 100px;
+    margin-bottom: 12px;
+    letter-spacing: 0.5px;
+}
+
+.word-example {
+    font-size: 14px;
+    color: var(--text2);
+    line-height: 1.6;
+    font-style: italic;
+}
+
+.word-example .blank {
+    color: var(--accent);
+    font-weight: 600;
+    font-style: normal;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    text-decoration-color: var(--accent3);
+}
+
+.word-hint {
+    font-size: 12px;
+    color: #aeaeb2;
+    margin-top: 8px;
+}
+
+/* 输入区 */
+.input-row {
+    display: flex;
+    gap: 10px;
+}
+
+.input-field {
+    flex: 1;
+    padding: 16px 20px;
+    font-size: 18px;
+    font-weight: 500;
+    border: 2px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: var(--card);
+    color: var(--text);
+    outline: none;
+    transition: all 0.2s;
+    letter-spacing: 0.5px;
+    font-family: inherit;
+}
+
+.input-field:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 4px rgba(0,113,227,0.1);
+}
+
+.input-field.correct {
+    border-color: #34c759;
+    background: rgba(52,199,89,0.04);
+}
+
+.input-field.wrong {
+    border-color: var(--accent2);
+    background: rgba(255,59,48,0.04);
+    animation: inputShake 0.3s;
+}
+
+@keyframes inputShake {
+    0%,100%{ transform: translateX(0); }
+    25%{ transform: translateX(-6px); }
+    75%{ transform: translateX(6px); }
+}
+
+.attack-btn {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    border: none;
+    background: var(--accent);
+    color: white;
+    font-size: 28px;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 4px 16px rgba(0,113,227,0.3);
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.attack-btn:hover {
+    transform: scale(1.08);
+    box-shadow: 0 6px 24px rgba(0,113,227,0.4);
+}
+
+.attack-btn:active {
+    transform: scale(0.92);
+    box-shadow: 0 2px 8px rgba(0,113,227,0.2);
+}
+
+.attack-btn.ult-ready {
+    background: linear-gradient(135deg, #ff9500, #ff3b30);
+    box-shadow: 0 4px 20px rgba(255,59,48,0.4);
+    animation: ultGlow 0.8s ease-in-out infinite;
+}
+
+@keyframes ultGlow {
+    0%,100%{ box-shadow: 0 4px 20px rgba(255,59,48,0.4); }
+    50%{ box-shadow: 0 8px 36px rgba(255,149,0,0.7); }
+}
+
+/* 统计栏 */
+.stats-row {
+    display: flex;
+    gap: 12px;
+}
+
+.stat-card {
+    flex: 1;
+    text-align: center;
+    padding: 16px 12px;
+    background: var(--card);
+    border-radius: var(--radius-sm);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.04);
+    border: 1px solid rgba(0,0,0,0.03);
+}
+
+.stat-value {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--text);
+    letter-spacing: -1px;
+}
+
+.stat-label {
+    font-size: 11px;
+    color: var(--text2);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-top: 2px;
+}
+
+.stat-value.combo-high {
+    color: var(--accent3);
+}
+
+.stat-value.lives-low {
+    color: var(--accent2);
+}
+
+/* 答案提示条 */
+.answer-toast {
+    position: fixed;
+    top: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--card);
+    padding: 12px 24px;
+    border-radius: 100px;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--accent2);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+    z-index: 100;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s;
+    border: 1px solid rgba(0,0,0,0.06);
+}
+
+.answer-toast.show {
+    opacity: 1;
+}
+
+.answer-toast .correct-word {
+    color: var(--accent);
+    font-weight: 700;
+}
+
+/* 特效层 */
+.effects-layer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 200;
+}
+
+/* 大宝剑特效 */
+.greatsword {
+    position: fixed;
+    font-size: 80px;
+    pointer-events: none;
+    z-index: 200;
+    animation: swordSlash 0.7s ease-out forwards;
+}
+
+@keyframes swordSlash {
+    0% {
+        transform: translate(-50%, -50%) rotate(-45deg) scale(0);
+        opacity: 1;
+    }
+    30% {
+        transform: translate(-50%, -50%) rotate(10deg) scale(1.5);
+        opacity: 1;
+    }
+    70% {
+        transform: translate(-50%, -50%) rotate(5deg) scale(1);
+        opacity: 0.8;
+    }
+    100% {
+        transform: translate(-50%, -50%) rotate(0deg) scale(2);
+        opacity: 0;
+    }
+}
+
+/* 伤害数字 */
+.float-text {
+    position: fixed;
+    font-weight: 700;
+    pointer-events: none;
+    z-index: 200;
+    animation: floatAway 0.9s ease-out forwards;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+
+@keyframes floatAway {
+    0%{ opacity:1; transform: translate(-50%,0) scale(0.5); }
+    30%{ opacity:1; transform: translate(-50%,-20px) scale(1.2); }
+    100%{ opacity:0; transform: translate(-50%,-60px) scale(0.8); }
+}
+
+.float-text.crit {
+    font-size: 40px;
+    color: #ff9500;
+}
+
+.float-text.normal {
+    font-size: 28px;
+    color: #ff3b30;
+}
+
+.float-text.heal {
+    font-size: 24px;
+    color: #34c759;
+}
+
+/* 弹窗 */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.4);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    z-index: 300;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s;
+}
+
+.modal-overlay.active {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.modal {
+    background: var(--card);
+    border-radius: var(--radius);
+    padding: 28px;
+    width: 90%;
+    max-width: 440px;
+    max-height: 80vh;
+    overflow-y: auto;
+    box-shadow: 0 30px 60px rgba(0,0,0,0.2);
+}
+
+.modal h3 {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 16px;
+    letter-spacing: -0.5px;
+}
+
+.modal-close {
+    float: right;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: none;
+    background: #f5f5f7;
+    font-size: 18px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.modal-close:hover {
+    background: #e5e5ea;
+}
+
+/* 词库列表 */
+.word-list-item {
+    padding: 14px 0;
+    border-bottom: 1px solid #f0f0f5;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.word-list-item:hover {
+    background: rgba(0,113,227,0.03);
+    border-radius: 8px;
+    padding-left: 8px;
+    padding-right: 8px;
+}
+
+.word-list-item:last-child {
+    border-bottom: none;
+}
+
+.word-list-en {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text);
+}
+
+.word-list-zh {
+    font-size: 14px;
+    color: var(--text2);
+    margin-top: 2px;
+}
+
+.word-list-pos {
+    font-size: 11px;
+    color: var(--accent);
+    display: inline-block;
+    margin-right: 6px;
+}
+
+.word-list-example {
+    font-size: 12px;
+    color: #aeaeb2;
+    margin-top: 4px;
+    font-style: italic;
+}
+
+/* 错词本为空 */
+.empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--text2);
+}
+
+.empty-state .icon {
+    font-size: 60px;
+    margin-bottom: 12px;
+}
+
+/* 搜索框 */
+.search-input {
+    width: 100%;
+    padding: 12px 16px;
+    border: 2px solid var(--border);
+    border-radius: var(--radius-xs);
+    font-size: 15px;
+    margin-bottom: 14px;
+    outline: none;
+    font-family: inherit;
+    background: #f9f9fb;
+}
+
+.search-input:focus {
+    border-color: var(--accent);
+    background: white;
+}
+
+/* 响应式 */
+@media (max-width: 400px) {
+    .card {
+        padding: 18px;
+    }
+    .word-main {
+        font-size: 28px;
+    }
+    .monster-emoji {
+        font-size: 80px;
+    }
+}
+</style>
+</head>
+<body>
+
+<div class="app-container" id="appContainer">
+
+    <!-- 导航栏 -->
+    <div class="nav-bar">
+        <div class="nav-title">词汇猎人</div>
+        <div class="nav-btns">
+            <button class="nav-btn" onclick="openWordBank()" title="词库">📖</button>
+            <button class="nav-btn" onclick="openWrongBook()" title="错词本">
+                📝
+                <span class="badge" id="wrongBadge" style="display:none">0</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- 怪物卡片 -->
+    <div class="card monster-card" id="monsterCard">
+        <div class="monster-emoji" id="monsterEmoji">👾</div>
+        <div class="monster-name" id="monsterName">暗影魔</div>
+        <div class="hp-container">
+            <div class="hp-bar-outer">
+                <div class="hp-bar-inner" id="hpBar" style="width:100%"></div>
+            </div>
+            <div class="hp-label" id="hpLabel">❤️ 5 / 5</div>
+        </div>
+    </div>
+
+    <!-- 单词卡片 -->
+    <div class="card word-card">
+        <div class="word-main" id="wordZh">废除</div>
+        <span class="word-pos" id="wordPos">v.</span>
+        <div class="word-example" id="wordExample">
+            Many people want to <span class="blank">_____</span> the death penalty.
+        </div>
+        <div class="word-hint" id="wordHint">💡 按 Tab 查看首字母提示</div>
+    </div>
+
+    <!-- 输入行 -->
+    <div class="input-row">
+        <input type="text" class="input-field" id="answerInput" placeholder="输入英文单词..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+        <button class="attack-btn" id="attackBtn" onclick="checkAnswer()">⚔️</button>
+    </div>
+
+    <!-- 统计栏 -->
+    <div class="stats-row">
+        <div class="stat-card">
+            <div class="stat-value" id="scoreVal">0</div>
+            <div class="stat-label">⭐ 分数</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value combo-high" id="comboVal">x1</div>
+            <div class="stat-label">🔥 连击</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value" id="livesVal">5</div>
+            <div class="stat-label">❤️ 生命</div>
+        </div>
+    </div>
+
+</div>
+
+<!-- 答案提示条 -->
+<div class="answer-toast" id="answerToast">
+    正确答案：<span class="correct-word" id="toastWord"></span>
+</div>
+
+<!-- 特效层 -->
+<div class="effects-layer" id="effectsLayer"></div>
+
+<!-- 弹窗：词库 -->
+<div class="modal-overlay" id="wordBankModal">
+    <div class="modal">
+        <button class="modal-close" onclick="closeWordBank()">✕</button>
+        <h3>📖 词汇库</h3>
+        <input type="text" class="search-input" id="wordSearch" placeholder="搜索单词..." oninput="renderWordBank()">
+        <div id="wordBankList"></div>
+    </div>
+</div>
+
+<!-- 弹窗：错词本 -->
+<div class="modal-overlay" id="wrongBookModal">
+    <div class="modal">
+        <button class="modal-close" onclick="closeWrongBook()">✕</button>
+        <h3>📝 错词本</h3>
+        <div id="wrongBookList"></div>
+        <button style="width:100%;padding:12px;border:none;background:var(--accent2);color:white;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;margin-top:12px;display:none;" id="clearWrongBtn" onclick="clearWrongBook()">清空错词本</button>
+    </div>
+</div>
+
+<script>
+// ==================== 音效引擎 ====================
+let audioCtx = null;
+function initAudio() {
+    if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    }
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+}
+
+function playTone(freq, type, duration, vol = 0.15, rampDown = true) {
+    if (!audioCtx) return;
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.type = type;
+    osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+    gain.gain.setValueAtTime(vol, audioCtx.currentTime);
+    if (rampDown) {
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+    }
+    osc.start(audioCtx.currentTime);
+    osc.stop(audioCtx.currentTime + duration);
+}
+
+function sfxAttack() {
+    playTone(200, 'sawtooth', 0.15, 0.2);
+    setTimeout(() => playTone(150, 'square', 0.1, 0.1), 50);
+}
+
+function sfxCrit() {
+    playTone(300, 'square', 0.2, 0.25);
+    setTimeout(() => playTone(500, 'sine', 0.15, 0.15), 80);
+    setTimeout(() => playTone(700, 'sine', 0.12, 0.1), 160);
+}
+
+function sfxUlt() {
+    playTone(60, 'sawtooth', 0.35, 0.3);
+    setTimeout(() => playTone(400, 'square', 0.2, 0.2), 100);
+    setTimeout(() => playTone(600, 'sine', 0.18, 0.15), 180);
+    setTimeout(() => playTone(900, 'sine', 0.15, 0.12), 260);
+}
+
+function sfxWrong() {
+    playTone(120, 'square', 0.3, 0.15);
+    setTimeout(() => playTone(80, 'sawtooth', 0.25, 0.12), 80);
+}
+
+function sfxKill() {
+    [300,400,500,600,800].forEach((f,i) => {
+        setTimeout(() => playTone(f, 'sine', 0.12, 0.1), i*70);
+    });
+}
+
+// ==================== 词汇库（完整版）====================
+const allWords = [
+    { zh: "废除", en: "abolish", pos: "v.", example: "Many people want to ___ the death penalty.", meaning: "正式终止（制度/法律）" },
+    { zh: "荒谬的", en: "absurd", pos: "adj.", example: "It's ___ to think that the earth is flat.", meaning: "不合逻辑，可笑" },
+    { zh: "丰富的", en: "abundant", pos: "adj.", example: "The region has ___ natural resources.", meaning: "大量的，充裕的" },
+    { zh: "滥用", en: "abuse", pos: "v./n.", example: "He was accused of ___ing his power.", meaning: "错误/过度使用" },
+    { zh: "完成", en: "accomplish", pos: "v.", example: "She managed to ___ her goal within a month.", meaning: "成功做到，达成" },
+    { zh: "积累", en: "accumulate", pos: "v.", example: "Dust tends to ___ on the shelves.", meaning: "逐渐增加/堆积" },
+    { zh: "指控", en: "accuse", pos: "v.", example: "They ___d him of stealing the money.", meaning: "声称某人做错事" },
+    { zh: "承认", en: "acknowledge", pos: "v.", example: "He refused to ___ his mistake.", meaning: "接受/认可事实" },
+    { zh: "获得", en: "acquire", pos: "v.", example: "She ___d a good knowledge of French.", meaning: "通过努力得到" },
+    { zh: "适应", en: "adapt", pos: "v.", example: "We need to ___ to the changing climate.", meaning: "调整以适合新环境" },
+    { zh: "充足的", en: "adequate", pos: "adj.", example: "The food supply is ___ for the trip.", meaning: "足够的，恰当的" },
+    { zh: "管理", en: "administer", pos: "v.", example: "They ___ the fund efficiently.", meaning: "组织运作/管理" },
+    { zh: "提倡", en: "advocate", pos: "v./n.", example: "He ___s for better education policies.", meaning: "公开支持/倡导者" },
+    { zh: "影响", en: "affect", pos: "v.", example: "The weather can ___ your mood greatly.", meaning: "产生影响（动词）" },
+    { zh: "侵略性的", en: "aggressive", pos: "adj.", example: "The dog became ___ when strangers approached.", meaning: "好斗的，侵略的" },
+    { zh: "分配", en: "allocate", pos: "v.", example: "The government ___d funds for the project.", meaning: "指定用途分配" },
+    { zh: "替代", en: "alternative", pos: "n./adj.", example: "We need to find an ___ solution.", meaning: "其他选择/替代的" },
+    { zh: "模糊的", en: "ambiguous", pos: "adj.", example: "The statement was ___ and confusing.", meaning: "可多种理解，含糊" },
+    { zh: "分析", en: "analyze", pos: "v.", example: "Scientists ___ the data carefully.", meaning: "详细检查分析" },
+    { zh: "明显的", en: "apparent", pos: "adj.", example: "It became ___ that he was lying.", meaning: "清楚可见的" },
+    { zh: "赞赏", en: "appreciate", pos: "v.", example: "I really ___ your help.", meaning: "认可价值，感激" },
+    { zh: "方法", en: "approach", pos: "n./v.", example: "We need a new ___ to solve this problem.", meaning: "处理方式/接近" },
+    { zh: "适当的", en: "appropriate", pos: "adj.", example: "Is this dress ___ for the occasion?", meaning: "合适的，恰当的" },
+    { zh: "武断的", en: "arbitrary", pos: "adj.", example: "The decision seemed ___ and unfair.", meaning: "随意而无根据的" },
+    { zh: "评估", en: "assess", pos: "v.", example: "They will ___ the damage after the storm.", meaning: "判断价值/评估" },
+    { zh: "假设", en: "assume", pos: "v.", example: "Don't ___ that everything will be fine.", meaning: "未经证实地认为" },
+    { zh: "气氛", en: "atmosphere", pos: "n.", example: "The restaurant has a romantic ___.", meaning: "环境感觉/大气层" },
+    { zh: "权威", en: "authority", pos: "n.", example: "The government has the ___ to make laws.", meaning: "合法权力/专家" },
+    { zh: "可用的", en: "available", pos: "adj.", example: "Is this room ___ for the meeting?", meaning: "可获得的，空闲的" },
+    { zh: "意识到", en: "aware", pos: "adj.", example: "She was ___ of the danger around her.", meaning: "知道的，意识到的" },
+    { zh: "障碍", en: "barrier", pos: "n.", example: "Language is a ___ to communication.", meaning: "阻碍物，屏障" },
+    { zh: "有益的", en: "beneficial", pos: "adj.", example: "Exercise is ___ to your health.", meaning: "有好处的" },
+    { zh: "预算", en: "budget", pos: "n./v.", example: "We need to ___ our expenses carefully.", meaning: "财务计划/做预算" },
+    { zh: "负担", en: "burden", pos: "n./v.", example: "The heavy tax became a ___ for the poor.", meaning: "重担/使负重" },
+    { zh: "能力", en: "capability", pos: "n.", example: "She has the ___ to lead the team.", meaning: "做某事的能力" },
+    { zh: "谨慎的", en: "cautious", pos: "adj.", example: "Be ___ when crossing the busy street.", meaning: "小心的，谨慎的" },
+    { zh: "挑战", en: "challenge", pos: "n./v.", example: "Climbing Everest is a great ___.", meaning: "困难任务/质疑" },
+    { zh: "同事", en: "colleague", pos: "n.", example: "I discussed the plan with my ___s.", meaning: "工作伙伴，同事" },
+    { zh: "战斗", en: "combat", pos: "v./n.", example: "We must ___ climate change together.", meaning: "与...斗争/战斗" },
+    { zh: "承诺", en: "commitment", pos: "n.", example: "She shows great ___ to her work.", meaning: "奉献，承诺" },
+    { zh: "沟通", en: "communicate", pos: "v.", example: "We ___ mostly by email.", meaning: "传达信息，交流" },
+    { zh: "补偿", en: "compensate", pos: "v.", example: "The company will ___ you for the loss.", meaning: "弥补，赔偿" },
+    { zh: "复杂的", en: "complex", pos: "adj.", example: "The problem is highly ___.", meaning: "难以理解的，复合的" },
+    { zh: "概念", en: "concept", pos: "n.", example: "It's a difficult ___ to understand.", meaning: "抽象观念，概念" },
+    { zh: "结论", en: "conclusion", pos: "n.", example: "We came to the ___ that it was safe.", meaning: "最终判断，结论" },
+    { zh: "具体的", en: "concrete", pos: "adj.", example: "We need ___ evidence, not rumors.", meaning: "确实的，混凝土的" },
+    { zh: "进行", en: "conduct", pos: "v.", example: "They will ___ an experiment.", meaning: "执行，进行" },
+    { zh: "冲突", en: "conflict", pos: "n./v.", example: "The two countries are in ___.", meaning: "对立，冲突" },
+    { zh: "后果", en: "consequence", pos: "n.", example: "You must face the ___s of your actions.", meaning: "结果（常负面）" },
+    { zh: "保守的", en: "conservative", pos: "adj.", example: "He is ___ in his spending habits.", meaning: "不激进的，保守的" },
+    { zh: "相当大的", en: "considerable", pos: "adj.", example: "A ___ amount of money was spent.", meaning: "相当多的" },
+    { zh: "一致的", en: "consistent", pos: "adj.", example: "Her work is always of ___ quality.", meaning: "始终如一的" },
+    { zh: "消费", en: "consume", pos: "v.", example: "Cars ___ a lot of fuel.", meaning: "使用掉，消耗" },
+    { zh: "贡献", en: "contribute", pos: "v.", example: "Everyone should ___ to society.", meaning: "做出贡献" },
+    { zh: "方便的", en: "convenient", pos: "adj.", example: "Is it ___ for you to meet at 3pm?", meaning: "便利的" },
+    { zh: "合作", en: "cooperate", pos: "v.", example: "The two companies decided to ___.", meaning: "协作，合作" },
+    { zh: "核心", en: "core", pos: "n./adj.", example: "Honesty is the ___ value of the company.", meaning: "中心部分，核心" },
+    { zh: "关键的", en: "crucial", pos: "adj.", example: "This decision is ___ for our future.", meaning: "决定性的，关键的" },
+    { zh: "欺骗", en: "deceive", pos: "v.", example: "Don't try to ___ me!", meaning: "误导，欺骗" },
+    { zh: "下降", en: "decline", pos: "v./n.", example: "The number of birds is ___ing.", meaning: "减少，下降" },
+    { zh: "击败", en: "defeat", pos: "v./n.", example: "They ___ed the enemy in battle.", meaning: "战胜，击败" },
+    { zh: "证明", en: "demonstrate", pos: "v.", example: "She ___d her ability to lead.", meaning: "展示证明" },
+    { zh: "依赖", en: "depend", pos: "v.", example: "Children ___ on their parents.", meaning: "依靠，取决于" },
+    { zh: "值得", en: "deserve", pos: "v.", example: "You ___ to be happy.", meaning: "应得，值得" },
+    { zh: "决心", en: "determination", pos: "n.", example: "He showed great ___ to succeed.", meaning: "坚定意志，决心" },
+    { zh: "困境", en: "dilemma", pos: "n.", example: "She faced a ___ between work and family.", meaning: "两难困境" },
+    { zh: "折扣", en: "discount", pos: "n./v.", example: "They offered a 20% ___ on all items.", meaning: "减价，折扣" },
+    { zh: "独特的", en: "distinct", pos: "adj.", example: "These two species are quite ___.", meaning: "明显不同的" },
+    { zh: "区分", en: "distinguish", pos: "v.", example: "Can you ___ between the twins?", meaning: "辨别，区分" },
+    { zh: "多样的", en: "diverse", pos: "adj.", example: "The city has a ___ population.", meaning: "多种多样的" },
+    { zh: "戏剧性的", en: "dramatic", pos: "adj.", example: "There was a ___ change in the weather.", meaning: "剧烈的，戏剧性的" },
+    { zh: "效率", en: "efficiency", pos: "n.", example: "We need to improve work ___.", meaning: "高效，效率" },
+    { zh: "消除", en: "eliminate", pos: "v.", example: "We aim to ___ poverty.", meaning: "彻底移除" },
+    { zh: "出现", en: "emerge", pos: "v.", example: "New problems began to ___.", meaning: "显现，浮现" },
+    { zh: "强调", en: "emphasis", pos: "n.", example: "The school puts ___ on discipline.", meaning: "重视，强调" },
+    { zh: "遭遇", en: "encounter", pos: "v./n.", example: "We ___ed some difficulties during the trip.", meaning: "意外遇到" },
+    { zh: "增强", en: "enhance", pos: "v.", example: "Good lighting ___s the room's beauty.", meaning: "提高，增强" },
+    { zh: "巨大的", en: "enormous", pos: "adj.", example: "The project cost an ___ amount of money.", meaning: "庞大的，巨大的" },
+    { zh: "确保", en: "ensure", pos: "v.", example: "Please ___ that the door is locked.", meaning: "保证，确保" },
+    { zh: "热情", en: "enthusiasm", pos: "n.", example: "She shows great ___ for her work.", meaning: "热忱，热情" },
+    { zh: "本质的", en: "essential", pos: "adj.", example: "Water is ___ for life.", meaning: "不可或缺的" },
+    { zh: "建立", en: "establish", pos: "v.", example: "They ___ed a new school in the village.", meaning: "创建，建立" },
+    { zh: "评估", en: "evaluate", pos: "v.", example: "Teachers ___ students' progress regularly.", meaning: "评判，评估" },
+    { zh: "证据", en: "evidence", pos: "n.", example: "There is no ___ to support his claim.", meaning: "证据，迹象" },
+    { zh: "夸张", en: "exaggerate", pos: "v.", example: "Don't ___ the difficulty of the task.", meaning: "言过其实" },
+    { zh: "检查", en: "examine", pos: "v.", example: "The doctor will ___ you thoroughly.", meaning: "仔细查看" },
+    { zh: "探索", en: "explore", pos: "v.", example: "We love to ___ new places.", meaning: "探寻，探索" },
+    { zh: "广泛的", en: "extensive", pos: "adj.", example: "He has ___ knowledge of history.", meaning: "广博的，广泛的" },
+    { zh: "非凡的", en: "extraordinary", pos: "adj.", example: "She has an ___ talent for music.", meaning: "惊人的，非凡的" },
+    { zh: "促进", en: "facilitate", pos: "v.", example: "Technology ___s communication.", meaning: "使更容易，促进" },
+    { zh: "迷人的", en: "fascinating", pos: "adj.", example: "The view is absolutely ___.", meaning: "极吸引人的" },
+    { zh: "可行的", en: "feasible", pos: "adj.", example: "Is this plan ___?", meaning: "可实行的" },
+    { zh: "灵活的", en: "flexible", pos: "adj.", example: "We have ___ working hours.", meaning: "可变通的" },
+    { zh: "繁荣", en: "flourish", pos: "v.", example: "The business began to ___.", meaning: "兴旺，繁荣" },
+    { zh: "根本的", en: "fundamental", pos: "adj.", example: "This is a ___ principle of physics.", meaning: "基础的，根本的" },
+    { zh: "慷慨的", en: "generous", pos: "adj.", example: "He is very ___ with his time.", meaning: "大方的，慷慨的" },
+    { zh: "真正的", en: "genuine", pos: "adj.", example: "Is this painting ___?", meaning: "真实的，真正的" },
+    { zh: "保证", en: "guarantee", pos: "v./n.", example: "We ___ the quality of our products.", meaning: "担保，保证" },
+    { zh: "严厉的", en: "harsh", pos: "adj.", example: "The punishment was too ___.", meaning: "严酷的，严厉的" },
+    { zh: "犹豫", en: "hesitate", pos: "v.", example: "Don't ___ to ask for help.", meaning: "迟疑，犹豫" },
+    { zh: "幻觉", en: "illusion", pos: "n.", example: "It was just an optical ___.", meaning: "错觉，幻觉" },
+    { zh: "立即的", en: "immediate", pos: "adj.", example: "We need an ___ response.", meaning: "立刻的" },
+    { zh: "影响", en: "impact", pos: "n./v.", example: "The new law had a big ___ on society.", meaning: "冲击力，影响" },
+    { zh: "实施", en: "implement", pos: "v.", example: "We need to ___ the plan immediately.", meaning: "执行，实施" },
+    { zh: "强加", en: "impose", pos: "v.", example: "Don't ___ your views on others.", meaning: "强加于" },
+    { zh: "收入", en: "income", pos: "n.", example: "She has a high monthly ___.", meaning: "收入" },
+    { zh: "不可避免的", en: "inevitable", pos: "adj.", example: "Change is ___.", meaning: "必然的" },
+    { zh: "创新", en: "innovation", pos: "n.", example: "Technology ___ is rapid.", meaning: "革新，创新" },
+    { zh: "强烈的", en: "intense", pos: "adj.", example: "The heat was ___.", meaning: "剧烈的，强烈的" },
+    { zh: "调查", en: "investigate", pos: "v.", example: "The police will ___ the crime.", meaning: "侦查，调查" },
+    { zh: "涉及", en: "involve", pos: "v.", example: "The job ___s a lot of travel.", meaning: "包含，涉及" },
+    { zh: "立法", en: "legislation", pos: "n.", example: "New ___ on privacy was passed.", meaning: "法律法规" },
+    { zh: "维持", en: "maintain", pos: "v.", example: "We must ___ high standards.", meaning: "保持，维持" },
+    { zh: "操纵", en: "manipulate", pos: "v.", example: "He tried to ___ the data.", meaning: "操控，操纵" },
+    { zh: "修改", en: "modify", pos: "v.", example: "We need to ___ the design slightly.", meaning: "稍作改动" },
+    { zh: "忽视", en: "neglect", pos: "v./n.", example: "Don't ___ your health.", meaning: "疏忽，忽视" },
+    { zh: "谈判", en: "negotiate", pos: "v.", example: "They are ___ing a peace deal.", meaning: "协商，谈判" },
+    { zh: "目标", en: "objective", pos: "n./adj.", example: "Our main ___ is to win.", meaning: "目标/客观的" },
+    { zh: "观察", en: "observe", pos: "v.", example: "We ___d the birds in the forest.", meaning: "观察" },
+    { zh: "获得", en: "obtain", pos: "v.", example: "You need to ___ permission first.", meaning: "取得，获得" },
+    { zh: "明显的", en: "obvious", pos: "adj.", example: "The answer is ___.", meaning: "清楚的，明显的" },
+    { zh: "对手", en: "opponent", pos: "n.", example: "He defeated his ___ in the match.", meaning: "敌手，对手" },
+    { zh: "机会", en: "opportunity", pos: "n.", example: "Don't miss this ___.", meaning: "良机，机会" },
+    { zh: "克服", en: "overcome", pos: "v.", example: "We must ___ our fears.", meaning: "战胜，克服" },
+    { zh: "参加", en: "participate", pos: "v.", example: "Everyone can ___ in the game.", meaning: "参与" },
+    { zh: "处罚", en: "penalty", pos: "n.", example: "The ___ for cheating is severe.", meaning: "惩罚，处罚" },
+    { zh: "永久的", en: "permanent", pos: "adj.", example: "He found a ___ job.", meaning: "长久的，永久的" },
+    { zh: "坚持", en: "persist", pos: "v.", example: "If symptoms ___ , see a doctor.", meaning: "持续存在，坚持" },
+    { zh: "视角", en: "perspective", pos: "n.", example: "Let's look at this from another ___.", meaning: "角度，视角" },
+    { zh: "现象", en: "phenomenon", pos: "n.", example: "This is a natural ___.", meaning: "现象" },
+    { zh: "潜在的", en: "potential", pos: "adj./n.", example: "He has great ___.", meaning: "可能性，潜在的" },
+    { zh: "精确的", en: "precise", pos: "adj.", example: "Give me ___ instructions.", meaning: "准确的，精确的" },
+    { zh: "预测", en: "predict", pos: "v.", example: "It's hard to ___ the weather.", meaning: "预言，预测" },
+    { zh: "偏见", en: "prejudice", pos: "n.", example: "Racial ___ still exists.", meaning: "成见，偏见" },
+    { zh: "保存", en: "preserve", pos: "v.", example: "We must ___ the environment.", meaning: "保护留存" },
+    { zh: "主要的", en: "principal", pos: "adj.", example: "My ___ concern is safety.", meaning: "首要的，主要的" },
+    { zh: "原则", en: "principle", pos: "n.", example: "He is a man of ___.", meaning: "行为准则，原则" },
+    { zh: "优先", en: "priority", pos: "n.", example: "Safety is our top ___.", meaning: "优先级，优先" },
+    { zh: "禁止", en: "prohibit", pos: "v.", example: "Smoking is ___ed here.", meaning: "禁止" },
+    { zh: "促进", en: "promote", pos: "v.", example: "We need to ___ healthy eating.", meaning: "推广，促进" },
+    { zh: "追求", en: "pursue", pos: "v.", example: "She decided to ___ her dreams.", meaning: "追寻，追求" },
+    { zh: "稀有的", en: "rare", pos: "adj.", example: "This is a ___ bird species.", meaning: "罕见的，稀有的" },
+    { zh: "理性的", en: "rational", pos: "adj.", example: "Let's be ___ about this.", meaning: "理智的，理性的" },
+    { zh: "反应", en: "reaction", pos: "n.", example: "What was her ___ to the news?", meaning: "回应，反应" },
+    { zh: "推荐", en: "recommend", pos: "v.", example: "Can you ___ a good book?", meaning: "推介，推荐" },
+    { zh: "反映", en: "reflect", pos: "v.", example: "Your actions ___ your character.", meaning: "映射，反映" },
+    { zh: "改革", en: "reform", pos: "v./n.", example: "The system needs ___.", meaning: "改良，改革" },
+    { zh: "加强", en: "reinforce", pos: "v.", example: "We need to ___ the structure.", meaning: "加固，加强" },
+    { zh: "相关的", en: "relevant", pos: "adj.", example: "Is this information ___?", meaning: "有关联的" },
+    { zh: "可靠的", en: "reliable", pos: "adj.", example: "He is a ___ source of information.", meaning: "可信的，可靠的" },
+    { zh: "取代", en: "replace", pos: "v.", example: "Can AI ___ human workers?", meaning: "代替，取代" },
+    { zh: "解决", en: "resolve", pos: "v.", example: "We need to ___ this issue quickly.", meaning: "解决" },
+    { zh: "限制", en: "restrict", pos: "v.", example: "They ___ access to the area.", meaning: "约束，限制" },
+    { zh: "揭示", en: "reveal", pos: "v.", example: "The report ___s some shocking facts.", meaning: "揭露，揭示" },
+    { zh: "牺牲", en: "sacrifice", pos: "v./n.", example: "She ___d her career for her family.", meaning: "牺牲" },
+    { zh: "严重的", en: "severe", pos: "adj.", example: "The storm caused ___ damage.", meaning: "剧烈的，严重的" },
+    { zh: "意义", en: "significance", pos: "n.", example: "This discovery has great ___.", meaning: "重要性，意义" },
+    { zh: "怀疑的", en: "skeptical", pos: "adj.", example: "I'm ___ about his claims.", meaning: "持疑的，怀疑的" },
+    { zh: "稳定的", en: "stable", pos: "adj.", example: "The economy is not ___ now.", meaning: "平稳的，稳定的" },
+    { zh: "刺激", en: "stimulate", pos: "v.", example: "Good questions ___ discussion.", meaning: "激发，刺激" },
+    { zh: "策略", en: "strategy", pos: "n.", example: "We need a new business ___.", meaning: "计策，策略" },
+    { zh: "提交", en: "submit", pos: "v.", example: "Please ___ your report by Friday.", meaning: "递交，提交" },
+    { zh: "充足的", en: "sufficient", pos: "adj.", example: "We have ___ food for everyone.", meaning: "足够的，充足的" },
+    { zh: "存活", en: "survive", pos: "v.", example: "Only a few ___d the accident.", meaning: "幸存，存活" },
+    { zh: "暂时的", en: "temporary", pos: "adj.", example: "This is just a ___ solution.", meaning: "临时的，暂时的" },
+    { zh: "彻底的", en: "thorough", pos: "adj.", example: "He did a ___ investigation.", meaning: "周全的，彻底的" },
+    { zh: "威胁", en: "threaten", pos: "v.", example: "Pollution ___s our health.", meaning: "构成威胁" },
+    { zh: "传统", en: "tradition", pos: "n.", example: "This is a family ___.", meaning: "传承习俗，传统" },
+    { zh: "转移", en: "transfer", pos: "v.", example: "He ___red to another school.", meaning: "调动，转移" },
+    { zh: "转变", en: "transform", pos: "v.", example: "The city has ___ed completely.", meaning: "彻底改变，转变" },
+    { zh: "趋势", en: "trend", pos: "n.", example: "What's the latest fashion ___?", meaning: "走向，趋势" },
+    { zh: "最终的", en: "ultimate", pos: "adj.", example: "Our ___ goal is peace.", meaning: "终极的，最终的" },
+    { zh: "独特的", en: "unique", pos: "adj.", example: "Each person is ___.", meaning: "独一无二的" },
+    { zh: "催促", en: "urge", pos: "v./n.", example: "I ___ you to reconsider.", meaning: "敦促，催促" },
+    { zh: "有效的", en: "valid", pos: "adj.", example: "Is this ticket still ___?", meaning: "有效的" },
+    { zh: "各种各样的", en: "various", pos: "adj.", example: "There are ___ ways to solve it.", meaning: "多种的" },
+    { zh: "至关重要的", en: "vital", pos: "adj.", example: "Water is ___ for survival.", meaning: "生死攸关的" },
+    { zh: "生动的", en: "vivid", pos: "adj.", example: "She gave a ___ description.", meaning: "形象的，生动的" },
+    { zh: "自愿的", en: "voluntary", pos: "adj.", example: "Participation is ___.", meaning: "自发的，自愿的" },
+    { zh: "脆弱的", en: "vulnerable", pos: "adj.", example: "Children are ___ to diseases.", meaning: "易受伤的，脆弱的" },
+    { zh: "财富", en: "wealth", pos: "n.", example: "Health is true ___.", meaning: "财富" },
+    { zh: "智慧", en: "wisdom", pos: "n.", example: "He shared his ___ with us.", meaning: "睿智，智慧" },
+    { zh: "见证", en: "witness", pos: "n./v.", example: "She was a ___ to the accident.", meaning: "目击者，见证" }
+];
+
+// ==================== 游戏状态 ====================
+let score = 0;
+let lives = 5;
+let combo = 0;
+let maxCombo = 0;
+let currentWord = null;
+let monsterHP = 5;
+const MONSTER_MAX_HP = 5;
+let isWaiting = false; // 防止重复提交
+let wrongBook = []; // 错词本 [{word, time}]
+
+// 怪物
+const monsters = [
+    { emoji: "👾", name: "暗影魔" },
+    { emoji: "👹", name: "赤鬼王" },
+    { emoji: "🐲", name: "毒龙" },
+    { emoji: "👻", name: "幽灵" },
+    { emoji: "🤖", name: "机械兽" },
+    { emoji: "💀", name: "骷髅王" },
+    { emoji: "🐉", name: "龙王" },
+    { emoji: "🦹", name: "超级反派" }
+];
+let currentMonster = monsters[0];
+
+// ==================== DOM 元素 ====================
+const monsterEmoji = document.getElementById('monsterEmoji');
+const monsterName = document.getElementById('monsterName');
+const hpBar = document.getElementById('hpBar');
+const hpLabel = document.getElementById('hpLabel');
+const wordZh = document.getElementById('wordZh');
+const wordPos = document.getElementById('wordPos');
+const wordExample = document.getElementById('wordExample');
+const wordHint = document.getElementById('wordHint');
+const answerInput = document.getElementById('answerInput');
+const attackBtn = document.getElementById('attackBtn');
+const scoreVal = document.getElementById('scoreVal');
+const comboVal = document.getElementById('comboVal');
+const livesVal = document.getElementById('livesVal');
+const answerToast = document.getElementById('answerToast');
+const toastWord = document.getElementById('toastWord');
+const effectsLayer = document.getElementById('effectsLayer');
+const wrongBadge = document.getElementById('wrongBadge');
+const appContainer = document.getElementById('appContainer');
+
+// ==================== 本地存储 ====================
+function saveWrongBook() {
+    localStorage.setItem('vocabHunter_wrongBook', JSON.stringify(wrongBook));
+}
+
+function loadWrongBook() {
+    const saved = localStorage.getItem('vocabHunter_wrongBook');
+    if (saved) {
+        wrongBook = JSON.parse(saved);
+    }
+    updateWrongBadge();
+}
+
+function addToWrongBook(wordObj) {
+    // 避免重复
+    const exists = wrongBook.find(w => w.en === wordObj.en);
+    if (!exists) {
+        wrongBook.push({
+            en: wordObj.en,
+            zh: wordObj.zh,
+            pos: wordObj.pos,
+            example: wordObj.example,
+            meaning: wordObj.meaning,
+            time: new Date().toLocaleString()
+        });
+        saveWrongBook();
+        updateWrongBadge();
+    }
+}
+
+function clearWrongBook() {
+    wrongBook = [];
+    saveWrongBook();
+    updateWrongBadge();
+    renderWrongBook();
+}
+
+function updateWrongBadge() {
+    if (wrongBook.length > 0) {
+        wrongBadge.style.display = 'flex';
+        wrongBadge.textContent = wrongBook.length > 99 ? '99+' : wrongBook.length;
+    } else {
+        wrongBadge.style.display = 'none';
+    }
+    const clearBtn = document.getElementById('clearWrongBtn');
+    if (clearBtn) clearBtn.style.display = wrongBook.length > 0 ? 'block' : 'none';
+}
+
+// ==================== 特效 ====================
+function createFloatText(x, y, text, cls = 'normal') {
+    const el = document.createElement('div');
+    el.className = 'float-text ' + cls;
+    el.textContent = text;
+    el.style.left = x + 'px';
+    el.style.top = y + 'px';
+    effectsLayer.appendChild(el);
+    setTimeout(() => el.remove(), 900);
+}
+
+function createGreatsword(x, y) {
+    const sword = document.createElement('div');
+    sword.className = 'greatsword';
+    sword.textContent = '🗡️';
+    sword.style.left = x + 'px';
+    sword.style.top = y + 'px';
+    effectsLayer.appendChild(sword);
+    setTimeout(() => sword.remove(), 700);
+}
+
+function showToast(correctAnswer) {
+    toastWord.textContent = correctAnswer;
+    answerToast.classList.add('show');
+    setTimeout(() => {
+        answerToast.classList.remove('show');
+    }, 1500);
+}
+
+// ==================== 游戏逻辑 ====================
+function randomMonster() {
+    currentMonster = monsters[Math.floor(Math.random() * monsters.length)];
+    monsterEmoji.textContent = currentMonster.emoji;
+    monsterName.textContent = currentMonster.name;
+    monsterEmoji.style.opacity = '1';
+    monsterEmoji.style.transform = 'scale(1) rotate(0deg)';
+}
+
+function randomWord() {
+    let newWord;
+    do {
+        newWord = allWords[Math.floor(Math.random() * allWords.length)];
+    } while (currentWord && newWord.en === currentWord.en && allWords.length > 1);
+    return newWord;
+}
+
+function updateHPUI() {
+    const pct = (monsterHP / MONSTER_MAX_HP) * 100;
+    hpBar.style.width = pct + '%';
+    hpLabel.textContent = '❤️ ' + monsterHP + ' / ' + MONSTER_MAX_HP;
+    
+    // 血条颜色变化
+    if (monsterHP <= 2) {
+        hpBar.style.background = '#ff3b30';
+    } else if (monsterHP <= 3) {
+        hpBar.style.background = '#ff9500';
+    } else {
+        hpBar.style.background = '#ff3b30';
+    }
+}
+
+function updateStatsUI() {
+    scoreVal.textContent = score;
+    comboVal.textContent = 'x' + combo;
+    livesVal.textContent = lives;
+    
+    if (combo >= 5) {
+        comboVal.classList.add('combo-high');
+    } else {
+        comboVal.classList.remove('combo-high');
+    }
+    
+    if (lives <= 2) {
+        livesVal.classList.add('lives-low');
+    } else {
+        livesVal.classList.remove('lives-low');
+    }
+    
+    // 攻击按钮效果
+    if (combo >= 4) {
+        attackBtn.classList.add('ult-ready');
+        attackBtn.textContent = '💥';
+    } else {
+        attackBtn.classList.remove('ult-ready');
+        attackBtn.textContent = '⚔️';
+    }
+}
+
+function displayWord(wordObj) {
+    currentWord = wordObj;
+    wordZh.textContent = wordObj.zh;
+    wordPos.textContent = wordObj.pos;
+    
+    const exampleHTML = wordObj.example.replace('___', '<span class="blank">_____</span>');
+    wordExample.innerHTML = exampleHTML;
+    
+    wordHint.textContent = '💡 按 Tab 查看首字母提示';
+}
+
+function nextWord() {
+    const newWord = randomWord();
+    displayWord(newWord);
+    answerInput.value = '';
+    answerInput.focus();
+    answerInput.classList.remove('correct', 'wrong');
+}
+
+function monsterDie() {
+    monsterEmoji.style.transform = 'scale(0) rotate(360deg)';
+    monsterEmoji.style.opacity = '0';
+    
+    sfxKill();
+    
+    setTimeout(() => {
+        monsterHP = MONSTER_MAX_HP;
+        updateHPUI();
+        randomMonster();
+        monsterEmoji.style.transform = 'scale(1) rotate(0deg)';
+        monsterEmoji.style.opacity = '1';
+    }, 500);
+}
+
+function resetGame() {
+    score = 0;
+    lives = 5;
+    combo = 0;
+    maxCombo = 0;
+    monsterHP = MONSTER_MAX_HP;
+    updateHPUI();
+    updateStatsUI();
+    randomMonster();
+    nextWord();
+    isWaiting = false;
+}
+
+function getMonsterCenter() {
+    const rect = monsterEmoji.getBoundingClientRect();
+    return {
+        x: rect.left + rect.width / 2,
+        y: rect.top + rect.height / 2
+    };
+}
+
+function checkAnswer() {
+    if (isWaiting) return;
+    if (!currentWord) return;
+    
+    initAudio();
+    
+    const answer = answerInput.value.trim().toLowerCase();
+    if (!answer) {
+        answerInput.placeholder = '⚠️ 请输入单词';
+        answerInput.classList.add('wrong');
+        setTimeout(() => {
+            answerInput.classList.remove('wrong');
+            answerInput.placeholder = '输入英文单词...';
+        }, 600);
+        return;
+    }
+    
+    const correctAnswer = currentWord.en.toLowerCase();
+    const monsterPos = getMonsterCenter();
+    
+    if (answer === correctAnswer) {
+        // ✅ 正确
+        isWaiting = true;
+        combo++;
+        if (combo > maxCombo) maxCombo = combo;
+        score += combo;
+        
+        answerInput.classList.add('correct');
+        
+        // 判断是否触发大招（连击5次以上）
+        if (combo >= 5) {
+            // 大宝剑特效！打3点血
+            sfxUlt();
+            createGreatsword(monsterPos.x, monsterPos.y - 40);
+            monsterEmoji.classList.add('ult-hit');
+            setTimeout(() => monsterEmoji.classList.remove('ult-hit'), 600);
+            
+            const damage = Math.min(3, monsterHP);
+            monsterHP -= damage;
+            createFloatText(monsterPos.x, monsterPos.y - 20, '⚔️-' + damage, 'crit');
+            
+            // 屏幕微震
+            appContainer.style.transform = 'translateX(-4px)';
+            setTimeout(() => appContainer.style.transform = '', 100);
+        } else if (combo >= 3) {
+            sfxCrit();
+            monsterEmoji.classList.add('crit-shake');
+            setTimeout(() => monsterEmoji.classList.remove('crit-shake'), 500);
+            monsterHP--;
+            createFloatText(monsterPos.x + 20, monsterPos.y - 20, '-' + combo, 'crit');
+        } else {
+            sfxAttack();
+            monsterEmoji.classList.add('shake');
+            setTimeout(() => monsterEmoji.classList.remove('shake'), 400);
+            monsterHP--;
+            createFloatText(monsterPos.x + Math.random() * 30, monsterPos.y - 20 + Math.random() * 10, '-' + combo, 'normal');
+        }
+        
+        updateHPUI();
+        updateStatsUI();
+        
+        if (monsterHP <= 0) {
+            createFloatText(monsterPos.x, monsterPos.y - 30, '💀击杀！', 'crit');
+            monsterDie();
+        }
+        
+        setTimeout(() => {
+            answerInput.classList.remove('correct');
+            nextWord();
+            updateStatsUI();
+            isWaiting = false;
+        }, monsterHP <= 0 ? 600 : 300);
+        
+    } else {
+        // ❌ 错误
+        isWaiting = true;
+        lives--;
+        combo = 0;
+        
+        answerInput.classList.add('wrong');
+        sfxWrong();
+        
+        // 加入错词本
+        addToWrongBook(currentWord);
+        
+        // 显示正确答案
+        showToast(correctAnswer);
+        answerInput.value = '';
+        answerInput.placeholder = '❌ 正确答案：' + correctAnswer;
+        
+        createFloatText(monsterPos.x - 10, monsterPos.y + 30, '💔 -1', 'heal');
+        
+        updateStatsUI();
+        
+        if (lives <= 0) {
+            setTimeout(() => {
+                alert('💀 游戏结束！\n\n最终得分：' + score + ' 分\n最高连击：x' + maxCombo + '\n错词数：' + wrongBook.length);
+                resetGame();
+            }, 500);
+        } else {
+            // 停顿1.5秒后进入下一题
+            setTimeout(() => {
+                answerInput.classList.remove('wrong');
+                answerInput.placeholder = '输入英文单词...';
+                nextWord();
+                updateStatsUI();
+                isWaiting = false;
+            }, 1500);
+        }
+    }
+}
+
+// ==================== 弹窗 ====================
+function openWordBank() {
+    document.getElementById('wordBankModal').classList.add('active');
+    document.getElementById('wordSearch').value = '';
+    renderWordBank();
+}
+
+function closeWordBank() {
+    document.getElementById('wordBankModal').classList.remove('active');
+}
+
+function openWrongBook() {
+    document.getElementById('wrongBookModal').classList.add('active');
+    renderWrongBook();
+}
+
+function closeWrongBook() {
+    document.getElementById('wrongBookModal').classList.remove('active');
+}
+
+function renderWordBank() {
+    const searchTerm = (document.getElementById('wordSearch')?.value || '').toLowerCase();
+    const list = document.getElementById('wordBankList');
+    
+    let filtered = allWords;
+    if (searchTerm) {
+        filtered = allWords.filter(w => 
+            w.en.toLowerCase().includes(searchTerm) || 
+            w.zh.includes(searchTerm)
+        );
+    }
+    
+    if (filtered.length === 0) {
+        list.innerHTML = '<div class="empty-state"><div class="icon">🔍</div><p>未找到匹配单词</p></div>';
+        return;
+    }
+    
+    list.innerHTML = filtered.map(w => `
+        <div class="word-list-item" onclick="speakWord('${w.en}')">
+            <div class="word-list-en">${w.en} <span class="word-list-pos">${w.pos}</span></div>
+            <div class="word-list-zh">${w.zh} — ${w.meaning}</div>
+            <div class="word-list-example">${w.example.replace('___', w.en)}</div>
+        </div>
+    `).join('');
+}
+
+function renderWrongBook() {
+    const list = document.getElementById('wrongBookList');
+    const clearBtn = document.getElementById('clearWrongBtn');
+    
+    if (wrongBook.length === 0) {
+        list.innerHTML = '<div class="empty-state"><div class="icon">🎉</div><p>错词本为空，继续加油！</p></div>';
+        if (clearBtn) clearBtn.style.display = 'none';
+    } else {
+        list.innerHTML = wrongBook.map((w, i) => `
+            <div class="word-list-item" onclick="speakWord('${w.en}')">
+                <div class="word-list-en">${w.en} <span class="word-list-pos">${w.pos}</span></div>
+                <div class="word-list-zh">${w.zh} — ${w.meaning}</div>
+                <div class="word-list-example">${w.example.replace('___', w.en)}</div>
+                <div style="font-size:10px;color:#aeaeb2;margin-top:2px;">添加于 ${w.time}</div>
+            </div>
+        `).join('');
+        if (clearBtn) clearBtn.style.display = 'block';
+    }
+}
+
+// TTS 朗读
+function speakWord(word) {
+    if ('speechSynthesis' in window) {
+        const utterance = new SpeechSynthesisUtterance(word);
+        utterance.lang = 'en-US';
+        utterance.rate = 0.9;
+        speechSynthesis.speak(utterance);
+    }
+}
+
+// ==================== 事件监听 ====================
+answerInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') {
+        checkAnswer();
+    }
+});
+
+answerInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Tab') {
+        e.preventDefault();
+        if (currentWord && !isWaiting) {
+            answerInput.value = currentWord.en[0];
+            wordHint.textContent = '💡 首字母：' + currentWord.en[0].toUpperCase() + ' （' + currentWord.en.length + '个字母）';
+        }
+    }
+});
+
+// 点击模态框外部关闭
+document.getElementById('wordBankModal').addEventListener('click', function(e) {
+    if (e.target === this) closeWordBank();
+});
+document.getElementById('wrongBookModal').addEventListener('click', function(e) {
+    if (e.target === this) closeWrongBook();
+});
+
+// ESC 关闭弹窗
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+        closeWordBank();
+        closeWrongBook();
+    }
+});
+
+// 首次点击初始化音频
+document.addEventListener('click', initAudio, { once: true });
+
+// ==================== 启动 ====================
+loadWrongBook();
+randomMonster();
+nextWord();
+updateHPUI();
+updateStatsUI();
+answerInput.focus();
+</script>
+</body>
+</html>
